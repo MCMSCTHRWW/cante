@@ -13,6 +13,9 @@ from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
 app.mount("/static", StaticFiles(directory="frontend"), name="static")
 templates = Jinja2Templates(directory="frontend")
 
