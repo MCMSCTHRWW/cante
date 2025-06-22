@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
 from database import Base
 
 class Usuario(Base):
@@ -16,3 +17,14 @@ class Tema(Base):
     nombre = Column(String, nullable=False)
     oposicion = Column(String, nullable=False)
     ejercicio = Column(Integer, nullable=False)
+
+class Cante(Base):
+    __tablename__ = "cantes"
+    id = Column(Integer, primary_key=True, index=True)
+    usuario_id = Column(Integer, ForeignKey("usuarios.id"))
+    tema = Column(String, nullable=False)
+    duracion = Column(Integer, nullable=False)
+    evaluacion = Column(String, nullable=True)  # bueno, regular, malo
+    fecha = Column(DateTime, default=datetime.utcnow)
+
+    usuario = relationship("Usuario", backref="cantes")
