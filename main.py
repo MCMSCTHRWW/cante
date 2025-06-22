@@ -109,11 +109,6 @@ def login(form: LoginForm, db: Session = Depends(get_db)):
   token = crear_token({"sub": user.email})
   return {"access_token": token, "token_type": "bearer"}
 
-# Test
-@app.get("/")
-def read_root():
-  return {"message": "¡Funciona Render con FastAPI!"}
-
 @app.get("/perfil")
 def perfil(usuario = Depends(get_usuario_actual)):
   return {
