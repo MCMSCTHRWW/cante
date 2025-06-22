@@ -12,6 +12,7 @@ class Usuario(Base):
 class Tema(Base):
     __tablename__ = "temas"
     id = Column(Integer, primary_key=True, index=True)
+    numero = Column(Integer, nullable=False)
     nombre = Column(String, nullable=False)
     oposicion = Column(String, nullable=False)
     ejercicio = Column(Integer, nullable=False)
