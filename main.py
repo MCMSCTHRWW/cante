@@ -4,13 +4,13 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from database import Base, engine, SessionLocal
-import models
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
+import models
 
 app = FastAPI()
 
@@ -80,7 +80,28 @@ def get_usuario_actual(token: str = Depends(oauth2_scheme), db: Session = Depend
     raise credenciales_invalidas
   return user
 
-# Endpoint: registro
+def insertar_temas_iniciales(db: Session):
+  temas = [
+    "La Constitución española de 1978: características y estructura. Derechos fundamentales y libertades públicas. La reforma constitucional.",
+    "Políticas Sociales Públicas: los derechos de las personas con discapacidad; protección a los colectivos más desfavorecidos; la dependencia. Las políticas de igualdad y no discriminación. La lucha contra la violencia de género.",
+    "La Hacienda Pública en la Constitución española. Los principios constitucionales del derecho financiero. Los derechos y garantías de los obligados tributarios. La financiación de las Haciendas territoriales.",
+    "Las Cortes Generales: composición y funciones. Órganos parlamentarios. El procedimiento legislativo ordinario. La Corona. El Rey. El Defensor del Pueblo.",
+    "El Gobierno: composición y funciones. El Consejo de Ministros y las Comisiones Delegadas del Gobierno.",
+    "El Poder Judicial: funciones. El gobierno del Poder Judicial. El Ministerio Fiscal. El Tribunal Constitucional.",
+    "La organización territorial del Estado: Comunidades y Ciudades Autónomas. Las Entidades Locales. Los Estatutos de Autonomía. Distribución de competencias.",
+    "Las Instituciones de la Unión Europea: el Parlamento Europeo, el Consejo Europeo, la Comisión, el Tribunal de Justicia, el BCE y el Tribunal de Cuentas.",
+    "El mercado interior: la libre circulación de mercancías, personas, servicios y capitales. Política agrícola y pesquera común. Política exterior y de seguridad común. El euro.",
+    "El Derecho de la Unión Europea. Las fuentes del ordenamiento de la UE y su aplicación. Relación con los estados miembros."
+  ]
+  for nombre in temas:
+    existe = db.query(Tema).filter_by(nombre=nombre, oposicion="Inspección de Hacienda", ejercicio=4).first()
+    if not existe:
+      db.add(Tema(nombre=nombre, oposicion="Inspección de Hacienda", ejercicio=4))
+  db.commit()
+
+with SessionLocal() as db:
+  insertar_temas_iniciales(db)
+
 @app.post("/registro")
 def registrar_usuario(user: RegistroUsuario, db: Session = Depends(get_db)):
   usuario_existente = db.query(models.Usuario).filter(models.Usuario.email == user.email).first()
