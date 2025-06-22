@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.requests import Request
 from fastapi.templating import Jinja2Templates
 import models
+from models import Tema
 
 app = FastAPI()
 
