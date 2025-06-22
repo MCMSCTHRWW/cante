@@ -128,3 +128,7 @@ def login_html(request: Request):
 @app.get("/registro", response_class=HTMLResponse)
 def registro_html(request: Request):
   return templates.TemplateResponse("registro.html", {"request": request})
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def dashboard(request: Request):
+  return templates.TemplateResponse("dashboard.html", {"request": request})
