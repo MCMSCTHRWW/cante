@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from pydantic import BaseModel
 from jose import jwt, JWTError
 from passlib.context import CryptContext
@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from database import Base, engine, SessionLocal
 import models
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordBearer
 
 app = FastAPI()
 
@@ -50,6 +51,25 @@ def crear_token(datos: dict, minutos_expira: int = 60):
   datos_a_codificar.update({"exp": expire})
   return jwt.encode(datos_a_codificar, SECRET_KEY, algorithm=ALGORITHM)
 
+def get_usuario_actual(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+  credenciales_invalidas = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Token inválido o expirado",
+    headers={"WWW-Authenticate": "Bearer"},
+  )
+  try:
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    email = payload.get("sub")
+    if email is None:
+      raise credenciales_invalidas
+  except JWTError:
+    raise credenciales_invalidas
+
+  user = db.query(models.Usuario).filter(models.Usuario.email == email).first()
+  if user is None:
+    raise credenciales_invalidas
+  return user
+
 # Endpoint: registro
 @app.post("/registro")
 def registrar_usuario(user: RegistroUsuario, db: Session = Depends(get_db)):
@@ -78,3 +98,10 @@ def login(form: LoginForm, db: Session = Depends(get_db)):
 @app.get("/")
 def read_root():
   return {"message": "¡Funciona Render con FastAPI!"}
+
+@app.get("/perfil")
+def perfil(usuario = Depends(get_usuario_actual)):
+  return {
+    "email": usuario.email,
+    "oposicion": usuario.oposicion
+  }
