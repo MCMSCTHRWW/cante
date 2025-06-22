@@ -88,7 +88,12 @@ def registrar_usuario(user: RegistroUsuario, db: Session = Depends(get_db)):
     raise HTTPException(status_code=400, detail="Este correo ya está registrado.")
     
   hashed = pwd_context.hash(user.password)
-  nuevo = models.Usuario(email=user.email, hashed_password=hashed, oposicion=user.oposicion)
+  nuevo = models.Usuario(
+    nombre=user.nombre,
+    email=user.email,
+    hashed_password=hashed,
+    oposicion=user.oposicion
+  )
   db.add(nuevo)
   db.commit()
   db.refresh(nuevo)
