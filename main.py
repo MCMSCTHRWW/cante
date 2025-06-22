@@ -153,3 +153,8 @@ def dashboard(request: Request):
 @app.get("/", response_class=HTMLResponse)
 def inicio(request: Request):
   return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/temas/{oposicion}/{ejercicio}")
+def listar_temas(oposicion: str, ejercicio: int, db: Session = Depends(get_db)):
+  temas = db.query(Tema).filter_by(oposicion=oposicion, ejercicio=ejercicio).limit(10).all()
+  return [{"id": t.id, "nombre": t.nombre} for t in temas]
