@@ -33,6 +33,9 @@ def get_db():
   finally:
     db.close()
 
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+templates = Jinja2Templates(directory="frontend")
+
 # Modelos de entrada
 class RegistroUsuario(BaseModel):
   email: str
@@ -114,4 +117,4 @@ def perfil(usuario = Depends(get_usuario_actual)):
 
 @app.get("/login", response_class=HTMLResponse)
 def login_html(request: Request):
-  return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("login.html", {"request": request})
