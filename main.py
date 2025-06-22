@@ -117,6 +117,7 @@ def read_root():
 @app.get("/perfil")
 def perfil(usuario = Depends(get_usuario_actual)):
   return {
+    "nombre": usuario.nombre,
     "email": usuario.email,
     "oposicion": usuario.oposicion
   }
