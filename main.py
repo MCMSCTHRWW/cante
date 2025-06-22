@@ -133,3 +133,7 @@ def registro_html(request: Request):
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
   return templates.TemplateResponse("dashboard.html", {"request": request})
+
+@app.get("/", response_class=HTMLResponse)
+def inicio(request: Request):
+  return templates.TemplateResponse("index.html", {"request": request})
