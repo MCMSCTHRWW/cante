@@ -36,9 +36,6 @@ def get_db():
   finally:
     db.close()
 
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
-templates = Jinja2Templates(directory="frontend")
-
 # Modelos de entrada
 class RegistroUsuario(BaseModel):
   email: str
