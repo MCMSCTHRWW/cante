@@ -38,9 +38,10 @@ def get_db():
 
 # Modelos de entrada
 class RegistroUsuario(BaseModel):
+  nombre: str
   email: str
   password: str
-  oposicion: str = None
+  oposicion: str
 
 class LoginForm(BaseModel):
   email: str
