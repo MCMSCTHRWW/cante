@@ -1,0 +1,48 @@
+<!-- frontend/registro.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro - Academia Cante</title>
+</head>
+<body>
+    <h2>Registrarse</h2>
+
+    <form id="registro-form">
+        <label>Email:</label><br>
+        <input type="email" id="email" required><br><br>
+
+        <label>Contraseña:</label><br>
+        <input type="password" id="password" required><br><br>
+
+        <label>Oposición (opcional):</label><br>
+        <input type="text" id="oposicion"><br><br>
+
+        <button type="submit">Registrar</button>
+    </form>
+
+    <pre id="resultado"></pre>
+
+    <script>
+        document.getElementById('registro-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const oposicion = document.getElementById('oposicion').value;
+
+            const res = await fetch('/registro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, oposicion })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                document.getElementById('resultado').textContent = "¡Registro exitoso!";
+            } else {
+                document.getElementById('resultado').textContent = "Error: " + data.detail;
+            }
+        });
+    </script>
+</body>
+</html>
