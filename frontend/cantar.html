@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cantar - Academia Cante</title>
+</head>
+<body>
+    <h2>Simulación de Cante</h2>
+
+    <label for="tema">Selecciona un tema:</label>
+    <select id="tema" required>
+        <option value="">-- Selecciona un tema --</option>
+    </select><br><br>
+
+    <button id="iniciar">🎤 Iniciar grabación</button>
+    <button id="pausar" disabled>⏸ Pausar</button>
+    <button id="finalizar" disabled>⏹ Finalizar</button>
+
+    <div id="resultado" style="margin-top: 20px;"></div>
+
+    <script>
+        let mediaRecorder;
+        let startTime;
+        let tiempoGrabado = 0;
+        let intervaloTiempo;
+        let chunks = [];
+
+        // Cargar temas desde backend
+        async function cargarTemas() {
+            const res = await fetch('/temas/Inspección de Hacienda/4');
+            const temas = await res.json();
+            const select = document.getElementById('tema');
+            temas.forEach(t => {
+                const option = document.createElement('option');
+                option.value = t.nombre;
+                option.textContent = t.nombre;
+                select.appendChild(option);
+            });
+        }
+
+        // Controlar botones
+        document.getElementById('iniciar').addEventListener('click', async () => {
+            const tema = document.getElementById('tema').value;
+            if (!tema) {
+                alert("Selecciona un tema antes de grabar");
+                return;
+            }
+
+            chunks = [];
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/webm' });
+                const duracion = Math.round((Date.now() - startTime) / 1000);
+                mostrarResultados(tema, duracion);
+            };
+
+            mediaRecorder.start();
+            startTime = Date.now();
+            intervaloTiempo = setInterval(() => {
+                const duracion = Math.round((Date.now() - startTime) / 1000);
+                document.getElementById('resultado').textContent = `Grabando... ${duracion} segundos`;
+            }, 1000);
+
+            document.getElementById('iniciar').disabled = true;
+            document.getElementById('pausar').disabled = false;
+            document.getElementById('finalizar').disabled = false;
+        });
+
+        document.getElementById('pausar').addEventListener('click', () => {
+            if (mediaRecorder.state === 'recording') {
+                mediaRecorder.pause();
+                clearInterval(intervaloTiempo);
+                document.getElementById('resultado').textContent = "Grabación pausada";
+                document.getElementById('pausar').textContent = "▶️ Reanudar";
+            } else if (mediaRecorder.state === 'paused') {
+                mediaRecorder.resume();
+                startTime = Date.now();
+                intervaloTiempo = setInterval(() => {
+                    const duracion = Math.round((Date.now() - startTime) / 1000);
+                    document.getElementById('resultado').textContent = `Grabando... ${duracion} segundos`;
+                }, 1000);
+                document.getElementById('pausar').textContent = "⏸ Pausar";
+            }
+        });
+
+        document.getElementById('finalizar').addEventListener('click', () => {
+            mediaRecorder.stop();
+            clearInterval(intervaloTiempo);
+            document.getElementById('iniciar').disabled = false;
+            document.getElementById('pausar').disabled = true;
+            document.getElementById('finalizar').disabled = true;
+        });
+
+        function mostrarResultados(tema, duracion) {
+            const div = document.getElementById('resultado');
+            div.innerHTML = `
+                <h3>Resultados</h3>
+                <p><strong>
