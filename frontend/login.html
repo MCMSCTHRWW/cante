@@ -23,25 +23,20 @@
     <pre id="resultado"></pre>
 
     <script>
-        // LOGIN
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            const res = await fetch('https://tu-app.onrender.com/login', {
+            const res = await fetch('/login', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             });
 
             const data = await res.json();
 
             if (res.ok) {
-                // Guarda el token en localStorage
                 localStorage.setItem('token', data.access_token);
                 alert("¡Login correcto!");
             } else {
@@ -49,19 +44,14 @@
             }
         });
 
-        // VER PERFIL
         async function verPerfil() {
             const token = localStorage.getItem('token');
 
-            const res = await fetch('https://tu-app.onrender.com/perfil', {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
+            const res = await fetch('/perfil', {
+                headers: { 'Authorization': 'Bearer ' + token }
             });
 
             const data = await res.json();
-
             document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
         }
     </script>
