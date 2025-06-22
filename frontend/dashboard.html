@@ -1,15 +1,23 @@
-<!-- frontend/dashboard.html -->
 <!DOCTYPE html>
 <html>
 <head>
     <title>Dashboard - Academia Cante</title>
 </head>
 <body>
-    <h2>Bienvenido/a a tu panel</h2>
+    <h1>Panel del opositor</h1>
 
     <div id="info-usuario">
-        Cargando información...
+        <p>Cargando información del perfil...</p>
     </div>
+
+    <hr>
+
+    <h2>Temario: Inspección de Hacienda – Ejercicio 4</h2>
+    <ul id="lista-temas">
+        <li>Cargando temas...</li>
+    </ul>
+
+    <hr>
 
     <button onclick="logout()">Cerrar sesión</button>
 
@@ -33,18 +41,24 @@
                     <p><strong>Email:</strong> ${data.email}</p>
                     <p><strong>Oposición:</strong> ${data.oposicion}</p>
                 `;
+
+                // Si es Inspección de Hacienda, cargar los temas
+                if (data.oposicion === "Inspección de Hacienda") {
+                    cargarTemas();
+                } else {
+                    document.getElementById('lista-temas').innerHTML = "<li>No hay temas disponibles para tu oposición.</li>";
+                }
+
             } else {
                 alert("Token inválido o expirado. Inicia sesión de nuevo.");
                 window.location.href = "/login";
             }
         }
 
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = "/login";
-        }
-
-        cargarPerfil();
-    </script>
-</body>
-</html>
+        async function cargarTemas() {
+            const res = await fetch('/temas/Inspección de Hacienda/4');
+            if (res.ok) {
+                const temas = await res.json();
+                const ul = document.getElementById('lista-temas');
+                ul.innerHTML = ""; // limpiar placeholder
+                temas
