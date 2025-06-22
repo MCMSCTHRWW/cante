@@ -94,7 +94,7 @@ def registrar_usuario(user: RegistroUsuario, db: Session = Depends(get_db)):
   return {"id": nuevo.id, "email": nuevo.email}
 
 # Endpoint: login con consulta real a la base de datos
-@app.post("/login", response_model=Token)
+@app.post("/api/login", response_model=Token)
 def login(form: LoginForm, db: Session = Depends(get_db)):
   user = db.query(models.Usuario).filter(models.Usuario.email == form.email).first()
   if not user or not verificar_password(form.password, user.hashed_password):
