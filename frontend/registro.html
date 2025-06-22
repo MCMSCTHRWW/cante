@@ -14,8 +14,12 @@
         <label>Contraseña:</label><br>
         <input type="password" id="password" required><br><br>
 
-        <label>Oposición (opcional):</label><br>
-        <input type="text" id="oposicion"><br><br>
+        <label>Oposición:</label><br>
+        <select id="oposicion" required>
+            <option value="">-- Selecciona una oposición --</option>
+            <option value="Inspección de Hacienda">Inspección de Hacienda</option>
+            <option value="Judicatura">Judicatura</option>
+        </select><br><br>
 
         <button type="submit">Registrar</button>
     </form>
@@ -31,18 +35,4 @@
 
             const res = await fetch('/registro', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, oposicion })
-            });
-
-            const data = await res.json();
-
-            if (res.ok) {
-                document.getElementById('resultado').textContent = "¡Registro exitoso!";
-            } else {
-                document.getElementById('resultado').textContent = "Error: " + data.detail;
-            }
-        });
-    </script>
-</body>
-</html>
+                headers: { 'Content-Type': '
