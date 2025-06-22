@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
+from database import Base, engine
+import models
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
@@ -20,6 +23,27 @@ fake_users_db {
     "oposicion": "judicatura"
   }
 }
+
+class RegistroUsuario(BaseModel):
+  email: str
+  password: str
+  oposicion: str = None
+
+def get_db():
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()
+
+@app.post("/registro")
+def registrar_usuario(user: RegistroUsuario, db: Session = Depends(get_db)):
+  hashed = pwd_context.hash(user.password)
+  nuevo = Usuario(email=user.email, hashed_password=hashed, oposicion=user.oposicion)
+  db.add(nuevo)
+  db.commit()
+  db.refresh(nuevo)
+  return {"id": nuevo.id, "email": nuevo.email}
 
 class LoginForm(BaseModel):
   email: str
@@ -45,6 +69,8 @@ def crear_token(datos: dict, minutos_expira: int = 60):
   expire = datetime.utcnow() + timedelta(minutes=minutos_expira)
   datos_a_codificar.update({"exp": expire})
   return jwt.encode(datos_a_codificar, SECRET_KEY, algorithm=ALGORITHM)
+
+models.Base.metadata.create_all(bind=engine)
 
 @app.post("/login", response_model=Token)
 def login(form: LoginForm):
