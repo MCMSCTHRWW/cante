@@ -111,3 +111,7 @@ def perfil(usuario = Depends(get_usuario_actual)):
     "email": usuario.email,
     "oposicion": usuario.oposicion
   }
+
+@app.get("/login", response_class=HTMLResponse)
+def login_html(request: Request):
+  return templates.TemplateResponse("login.html", {"request": request})
