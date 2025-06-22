@@ -1,4 +1,3 @@
-<!-- frontend/registro.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,6 +7,9 @@
     <h2>Registrarse</h2>
 
     <form id="registro-form">
+        <label>Nombre completo:</label><br>
+        <input type="text" id="nombre" required><br><br>
+
         <label>Email:</label><br>
         <input type="email" id="email" required><br><br>
 
@@ -29,10 +31,33 @@
     <script>
         document.getElementById('registro-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+
+            const nombre = document.getElementById('nombre').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const oposicion = document.getElementById('oposicion').value;
 
+            // Validación avanzada
+            if (!nombre || !email || !password || !oposicion) {
+                document.getElementById('resultado').textContent = "Por favor, rellena todos los campos.";
+                return;
+            }
+
             const res = await fetch('/registro', {
                 method: 'POST',
-                headers: { 'Content-Type': '
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, email, password, oposicion })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("¡Registro exitoso! Redirigiendo al login...");
+                window.location.href = "/login";
+            } else {
+                document.getElementById('resultado').textContent = "Error: " + data.detail;
+            }
+        });
+    </script>
+</body>
+</html>
